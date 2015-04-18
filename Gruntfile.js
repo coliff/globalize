@@ -74,6 +74,12 @@ module.exports = function( grunt ) {
 					jshintrc: ".jshintrc"
 				}
 			},
+			tool: {
+				src: [ "tool/*.js" ],
+				options: {
+					jshintrc: ".jshintrc"
+				}
+			},
 			test: {
 				src: [ "test/*.js", "test/functional/**/*.js", "test/unit/**/*.js",
 					"!test/config.js" ],
@@ -360,6 +366,46 @@ module.exports = function( grunt ) {
 									endFile: "src/build/outro.js"
 								}
 							}
+						},
+						{
+							name: "globalize-runtime",
+							include: [ "core-runtime" ],
+							create: true,
+							override: {
+								wrap: {
+									startFile: "src/build/intro-core-runtime.js",
+									endFile: "src/build/outro.js"
+								}
+							}
+						},
+						{
+							name: "globalize.date-runtime",
+							include: [ "date-runtime" ],
+							exclude: [
+								"./core-runtime",
+								"./number-runtime"
+							],
+							create: true,
+							override: {
+								wrap: {
+									startFile: "src/build/intro-date-runtime.js",
+									endFile: "src/build/outro.js"
+								}
+							}
+						},
+						{
+							name: "globalize.number-runtime",
+							include: [ "number-runtime" ],
+							exclude: [
+								"./core-runtime"
+							],
+							create: true,
+							override: {
+								wrap: {
+									startFile: "src/build/intro-number-runtime.js",
+									endFile: "src/build/outro.js"
+								}
+							}
 						}
 					]
 				}
@@ -383,13 +429,13 @@ module.exports = function( grunt ) {
 			core: {
 				expand: true,
 				cwd: "dist/.build/",
-				src: [ "globalize.js" ],
+				src: [ "globalize.js", "globalize-runtime.js" ],
 				dest: "dist/"
 			},
 			modules: {
 				expand: true,
 				cwd: "dist/.build/",
-				src: [ "globalize*.js", "!globalize.js" ],
+				src: [ "globalize*.js", "!globalize.js", "!globalize-runtime.js" ],
 				dest: "dist/globalize",
 				rename: function( dest, src ) {
 					return require( "path" ).join( dest, src.replace( /globalize\./, "" ) );
@@ -412,7 +458,11 @@ module.exports = function( grunt ) {
 					"tmp/globalize/number.min.js": [ "dist/globalize/number.js" ],
 					"tmp/globalize/plural.min.js": [ "dist/globalize/plural.js" ],
 					"tmp/globalize/message.min.js": [ "dist/globalize/message.js" ],
-					"tmp/globalize/relative-time.min.js": [ "dist/globalize/relative-time.js" ]
+					"tmp/globalize/relative-time.min.js": [ "dist/globalize/relative-time.js" ],
+
+					"tmp/globalize-runtime.min.js": [ "dist/globalize-runtime.js" ],
+					"tmp/globalize/date-runtime.min.js": [ "dist/globalize/date-runtime.js" ],
+					"tmp/globalize/number-runtime.min.js": [ "dist/globalize/number-runtime.js" ]
 				}
 			}
 		},
@@ -421,6 +471,7 @@ module.exports = function( grunt ) {
 		"compare_size": {
 			files: [
 				"tmp/globalize.min.js",
+				"tmp/globalize-runtime.min.js",
 				"tmp/globalize/*min.js"
 			],
 			options: {
@@ -465,6 +516,7 @@ module.exports = function( grunt ) {
 	// Default task.
 	grunt.registerTask( "default", [
 		"jshint:grunt",
+		"jshint:tool",
 		"jshint:source",
 		"jshint:test",
 		"jscs:grunt",
